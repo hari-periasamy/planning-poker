@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Planning Poker</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; }
+        .card { display: inline-block; margin: 10px; padding: 20px; border: 1px solid black; cursor: pointer; }
+        .hidden { color: #aaa; }
+    </style>
+</head>
+<body>
+    <h1>Planning Poker</h1>
+    <input type="text" id="username" placeholder="Your name">
+    <input type="text" id="room" placeholder="Room name">
+    <button onclick="joinRoom()">Join Room</button>
+
+    <div id="game" style="display:none;">
+        <h2>Room: <span id="roomName"></span></h2>
+
+        <input type="text" id="linkInput" placeholder="Paste link here" oninput="updateLinkDisplay()">
+        <div id="linkDisplay"></div>
+
+        <div id="cards"></div>
+        <button onclick="revealVotes()">Reveal Votes</button>
+        <button onclick="resetVotes()">Reset Votes</button>
+
+        <h3>Votes:</h3>
+        <ul id="users"></ul>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        let currentRoom = '';
+        let votesRevealed = false;
+        let users = {};
+
+        const cardValues = [1, 2, 3, 5, 8, 13, 21, '?'];
+
+        function createCards() {
+            const cardsContainer = document.getElementById('cards');
+            cardsContainer.innerHTML = '';
+            cardValues.forEach(val => {
+                const cardDiv = document.createElement('div');
+                cardDiv.classList.add('card');
+                cardDiv.textContent = val;
+                cardDiv.onclick = () => submitVote(val);
+                cardsContainer.appendChild(cardDiv);
+            });
+        }
+
+        function joinRoom() {
+            const username = document.getElementById('username').value;
+            const room = document.getElementById('room').value;
+            if (!username || !room) {
+                alert("Please enter both username and room name.");
+                return;
+            }
+            currentRoom = room;
+            document.getElementById('roomName').textContent = room;
+            document.getElementById('game').style.display = 'block';
+
+            createCards();
+
+            socket.emit('joinRoom', { room, username });
+        }
+
+        function submitVote(vote) {
+            socket.emit('submitVote', { room: currentRoom, vote });
+        }
+
+        function revealVotes() {
+            socket.emit('revealVotes', currentRoom);
+        }
+
+        function resetVotes() {
+            socket.emit('resetVotes', currentRoom);
+            // Clear the link input and display
+            document.getElementById('linkInput').value = '';
+            document.getElementById('linkDisplay').innerHTML = '';
+        }
+
+        function renderUsers() {
+            const userList = document.getElementById('users');
+            userList.innerHTML = '';
+            for (const id in users) {
+                const user = users[id];
+                const li = document.createElement('li');
+                if (!user.vote) {
+                    li.textContent = `${user.username}: [Not Voted]`;
+                } else {
+                    li.textContent = `${user.username}: ${votesRevealed ? user.vote : '🃏'}`;
+                }
+                userList.appendChild(li);
+            }
+        }
+
+<!--        function updateLinkDisplay() {-->
+<!--            const input = document.getElementById('linkInput').value;-->
+<!--            const display = document.getElementById('linkDisplay');-->
+<!--            const urlRegex = /^(https?:\/\/[^\s]+)/;-->
+<!--            if (urlRegex.test(input)) {-->
+<!--                display.innerHTML = `<a href="${input}" target="_blank">${input}</a>`;-->
+<!--            } else {-->
+<!--                display.innerHTML = '';-->
+<!--            }-->
+<!--        }-->
+
+function updateLinkDisplay() {
+    const input = document.getElementById('linkInput').value;
+    const urlRegex = /^(https?:\/\/[^\s]+)/;
+    if (urlRegex.test(input)) {
+        socket.emit('linkUpdate', { room: currentRoom, link: input });
+    } else {
+        socket.emit('linkUpdate', { room: currentRoom, link: '' }); // Clear if invalid
+    }
+}
+
+        socket.on('updateUsers', (serverUsers) => {
+            users = serverUsers;
+            renderUsers();
+            document.getElementById('linkDisplay').innerHTML = `<a href="${input}" target="_blank">${input}</a>`;
+        });
+
+        socket.on('revealVotes', () => {
+            votesRevealed = true;
+            renderUsers();
+        });
+
+        socket.on('resetVotes', () => {
+            votesRevealed = false;
+            renderUsers();
+            // Also clear the link input and display
+            document.getElementById('linkInput').value = '';
+            document.getElementById('linkDisplay').innerHTML = '';
+        });
+
+        socket.on('linkUpdate', (link) => {
+    const display = document.getElementById('linkDisplay');
+    const input = document.getElementById('linkInput');
+
+    if (link && link.startsWith('http')) {
+        display.innerHTML = `<a href="${link}" target="_blank">${link}</a>`;
+        input.value = link;
+    } else {
+        display.innerHTML = '';
+        input.value = '';
+    }
+});
+
+    </script>
+</body>
+</html>
