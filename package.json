@@ -1,18 +1,17 @@
 {
+  "name": "planning-poker",
+  "version": "1.0.0",
+  "description": "A real-time planning poker app using Express and Socket.IO",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "deploy": "npm install && npm run start"
+  },
+  "author": "Your Name",
+  "license": "ISC",
   "dependencies": {
     "express": "^5.1.0",
     "socket.io": "^4.8.1"
   },
-  "name": "planning-poker",
-  "version": "1.0.0",
-  "main": "server.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js",
-    "deploy": "node --version"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": ""
+  "keywords": ["planning", "poker", "scrum", "socket.io", "express"]
 }
