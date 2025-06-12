@@ -11,6 +11,17 @@ app.use(express.static('public'));
 const roomLinks = {};
 const rooms = {};
 
+export default {
+  fetch(request) {
+    const base = "https://example.com";
+    const statusCode = 301;
+
+    const source = new URL(request.url);
+    const destination = new URL(source.pathname, base);
+    return Response.redirect(destination.toString(), statusCode);
+  },
+};
+
 io.on('connection', (socket) => {
     console.log('A user connected:', socket.id);
 
