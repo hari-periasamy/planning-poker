@@ -2,3 +2,4 @@ name = "planning-poker"
 type = "webpack"
 main = "server.js"
 compatibility_date = "2025-06-12"
+compatibility_flags = [ "nodejs_compat" ]
