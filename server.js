@@ -4,7 +4,7 @@ import { Server } from 'socket.io';
 
 const app = express();
 const server = http.createServer(app);
-const io = Server(server);
+const io = new Server(server);
 
 app.use(express.static('public'));
 
