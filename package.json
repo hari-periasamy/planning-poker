@@ -1,5 +1,6 @@
 {
   "name": "planning-poker",
+  "type": "module",
   "version": "1.0.0",
   "description": "A real-time planning poker app using Express and Socket.IO",
   "main": "server.js",
