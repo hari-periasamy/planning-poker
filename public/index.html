@@ -2,23 +2,42 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Planning Poker</title>
+    <title >Planning Poker</title>
     <style>
         body { font-family: sans-serif; text-align: center; }
         .card { display: inline-block; margin: 10px; padding: 20px; border: 1px solid black; cursor: pointer; }
         .hidden { color: #aaa; }
+
+
+  @keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .card-style {
+    background-color: lightblue;
+    color: black;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    width: 200px;
+    animation: pulse 2s infinite;
+  }
+
+
     </style>
 </head>
 <body>
-    <h1>Planning Poker</h1>
+<h1 style="color:#2c6fbb;"><strong>Planning Poker</strong></h1>
     <input type="text" id="username" placeholder="Your name">
     <input type="text" id="room" placeholder="Room name">
-    <button onclick="joinRoom()">Join Room</button>
+    <button onclick="joinRoom()" style="color:#2c6fbb  ;"><strong>Join Room</strong></button>
 
     <div id="game" style="display:none;">
-        <h2>Room: <span id="roomName"></span></h2>
+        <h2> Room: <span id="roomName" style="color : #2c6fbb"></span></h2>
 
-        <input type="text" id="linkInput" placeholder="Paste link here" oninput="updateLinkDisplay()">
+        <h3>JIRA ID : <input type="text" id="linkInput" placeholder="Paste link here" oninput="updateLinkDisplay()"></h3>
         <div id="linkDisplay"></div>
 
         <div id="cards"></div>
@@ -45,6 +64,7 @@
                 const cardDiv = document.createElement('div');
                 cardDiv.classList.add('card');
                 cardDiv.textContent = val;
+                cardDiv.style.backgroundColor = 'lightblue';
                 cardDiv.onclick = () => submitVote(val);
                 cardsContainer.appendChild(cardDiv);
             });
@@ -89,6 +109,7 @@
                 const li = document.createElement('li');
                 if (!user.vote) {
                     li.textContent = `${user.username}: [Not Voted]`;
+                    li.style.animation = 'pulse 2s infinite';
                 } else {
                     li.textContent = `${user.username}: ${votesRevealed ? user.vote : '🃏'}`;
                 }
@@ -101,7 +122,7 @@
 <!--            const display = document.getElementById('linkDisplay');-->
 <!--            const urlRegex = /^(https?:\/\/[^\s]+)/;-->
 <!--            if (urlRegex.test(input)) {-->
-<!--                display.innerHTML = `<a href="${input}" target="_blank">${input}</a>`;-->
+<!--                display.innerHTML = `<br><a href="${input}" target="_blank">${input}</a><br>`;-->
 <!--            } else {-->
 <!--                display.innerHTML = '';-->
 <!--            }-->
@@ -120,7 +141,7 @@ function updateLinkDisplay() {
         socket.on('updateUsers', (serverUsers) => {
             users = serverUsers;
             renderUsers();
-            document.getElementById('linkDisplay').innerHTML = `<a href="${input}" target="_blank">${input}</a>`;
+            document.getElementById('linkDisplay').innerHTML = `<br><a href="${input}" target="_blank">${input}</a><br>`;
         });
 
         socket.on('revealVotes', () => {
@@ -141,7 +162,7 @@ function updateLinkDisplay() {
     const input = document.getElementById('linkInput');
 
     if (link && link.startsWith('http')) {
-        display.innerHTML = `<a href="${link}" target="_blank">${link}</a>`;
+        display.innerHTML = `<br><a href="${link}" target="_blank">${link}</a><br>`;
         input.value = link;
     } else {
         display.innerHTML = '';
