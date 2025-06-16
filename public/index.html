@@ -110,8 +110,11 @@
                 if (!user.vote) {
                     li.textContent = `${user.username}: [Not Voted]`;
                     li.style.animation = 'pulse 2s infinite';
+                    li.style.color = 'red';
+                    li.style.listStyleType = 'none';
                 } else {
                     li.textContent = `${user.username}: ${votesRevealed ? user.vote : '🃏'}`;
+                    li.style.listStyleType = 'none';
                 }
                 userList.appendChild(li);
             }
